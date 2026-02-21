@@ -30,18 +30,18 @@
             margin-bottom: 0.5rem;
         }
         
+        /* Controls - expanded for more filters */
         .controls {
             background: rgba(255, 255, 255, 0.05);
             padding: 1rem 2rem;
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1rem;
-            flex-wrap: wrap;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .search-box {
-            flex: 1;
-            min-width: 250px;
+            grid-column: 1 / -1;
             position: relative;
         }
         
@@ -69,16 +69,36 @@
         
         .filter-group {
             display: flex;
-            gap: 0.5rem;
-            align-items: center;
+            flex-direction: column;
+            gap: 0.25rem;
         }
         
-        .filter-group input, select {
+        .filter-group label {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .filter-group input, .filter-group select {
             padding: 0.5rem 0.75rem;
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 6px;
             color: #fff;
+            font-size: 0.9rem;
+        }
+        
+        .filter-group input:focus, .filter-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn-group {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
         }
         
         .btn {
@@ -89,6 +109,15 @@
             color: #fff;
             font-weight: 600;
             cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
         }
         
         .stats-bar {
@@ -110,7 +139,6 @@
             opacity: 0.7;
         }
         
-        /* Timeline wrapper - increased height, no overflow-y hidden */
         .timeline-wrapper {
             padding: 4rem 0 10rem 0;
             overflow-x: auto;
@@ -239,7 +267,6 @@
             color: #fff;
         }
         
-        /* Info card below with plenty of space */
         .token-info {
             position: absolute;
             top: 110px;
@@ -350,26 +377,54 @@
         </div>
         
         <div class="filter-group">
-            <label>From:</label>
+            <label>Date From</label>
             <input type="date" id="dateFrom" value="2025-01-01">
         </div>
         
         <div class="filter-group">
-            <label>To:</label>
+            <label>Date To</label>
             <input type="date" id="dateTo">
         </div>
         
         <div class="filter-group">
-            <label>DEX:</label>
+            <label>Min Current Mcap</label>
+            <input type="number" id="minMcap" placeholder="e.g. 100000" step="100000">
+        </div>
+        
+        <div class="filter-group">
+            <label>Max Current Mcap</label>
+            <input type="number" id="maxMcap" placeholder="Unlimited">
+        </div>
+        
+        <div class="filter-group">
+            <label>Min ATH Mcap</label>
+            <input type="number" id="minAthMcap" placeholder="e.g. 1000000" step="100000">
+        </div>
+        
+        <div class="filter-group">
+            <label>Max ATH Mcap</label>
+            <input type="number" id="maxAthMcap" placeholder="Unlimited">
+        </div>
+        
+        <div class="filter-group">
+            <label>Min 24h Volume</label>
+            <input type="number" id="minVolume" placeholder="e.g. 10000" step="10000">
+        </div>
+        
+        <div class="filter-group">
+            <label>DEX</label>
             <select id="dexFilter">
-                <option value="">All</option>
+                <option value="">All DEXs</option>
                 <option value="raydium">Raydium</option>
                 <option value="orca">Orca</option>
                 <option value="meteora">Meteora</option>
             </select>
         </div>
         
-        <button class="btn" onclick="applyFilters()">Apply</button>
+        <div class="btn-group">
+            <button class="btn" onclick="applyFilters()">Apply Filters</button>
+            <button class="btn btn-secondary" onclick="resetFilters()">Reset</button>
+        </div>
     </div>
 
     <div class="stats-bar" id="stats"></div>
@@ -402,13 +457,15 @@
             });
 
         function scrollTimeline(amount) {
-            const wrapper = document.getElementById('timelineWrapper');
-            wrapper.scrollBy({ left: amount, behavior: 'smooth' });
+            document.getElementById('timelineWrapper').scrollBy({ left: amount, behavior: 'smooth' });
         }
 
         function renderStats() {
             const total = filteredTokens.reduce((sum, t) => sum + (t.current_mcap || 0), 0);
             const vol = filteredTokens.reduce((sum, t) => sum + (t.volume_24h || 0), 0);
+            const avgAth = filteredTokens.length > 0 
+                ? filteredTokens.reduce((sum, t) => sum + (t.ath_mcap || t.current_mcap || 0), 0) / filteredTokens.length 
+                : 0;
 
             document.getElementById('stats').innerHTML = `
                 <div class="stat">
@@ -418,6 +475,10 @@
                 <div class="stat">
                     <div class="stat-value">$${(total / 1e9).toFixed(1)}B</div>
                     <div class="stat-label">Total Mcap</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">$${(avgAth / 1e6).toFixed(1)}M</div>
+                    <div class="stat-label">Avg ATH</div>
                 </div>
                 <div class="stat">
                     <div class="stat-value">$${(vol / 1e6).toFixed(1)}M</div>
@@ -504,14 +565,53 @@
             const from = new Date(document.getElementById('dateFrom').value).getTime() / 1000;
             const to = new Date(document.getElementById('dateTo').value).getTime() / 1000 + 86400;
             const dex = document.getElementById('dexFilter').value;
+            const minMcap = parseFloat(document.getElementById('minMcap').value) || 0;
+            const maxMcap = parseFloat(document.getElementById('maxMcap').value) || Infinity;
+            const minAthMcap = parseFloat(document.getElementById('minAthMcap').value) || 0;
+            const maxAthMcap = parseFloat(document.getElementById('maxAthMcap').value) || Infinity;
+            const minVolume = parseFloat(document.getElementById('minVolume').value) || 0;
 
             filteredTokens = allTokens.filter(t => {
+                // Search
                 if (search && !t.symbol.toLowerCase().includes(search) && !t.name.toLowerCase().includes(search)) return false;
+                
+                // Date range
                 if (t.launch_date < from || t.launch_date > to) return false;
+                
+                // DEX
                 if (dex && t.dex.toLowerCase() !== dex.toLowerCase()) return false;
+                
+                // Current mcap range
+                const mcap = t.current_mcap || 0;
+                if (mcap < minMcap || mcap > maxMcap) return false;
+                
+                // ATH mcap range
+                const athMcap = t.ath_mcap || t.current_mcap || 0;
+                if (athMcap < minAthMcap || athMcap > maxAthMcap) return false;
+                
+                // Volume
+                const vol = t.volume_24h || 0;
+                if (vol < minVolume) return false;
+                
                 return true;
             });
 
+            renderTimeline();
+            renderStats();
+        }
+
+        function resetFilters() {
+            document.getElementById('search').value = '';
+            document.getElementById('dateFrom').value = '2025-01-01';
+            document.getElementById('dateTo').value = new Date().toISOString().split('T')[0];
+            document.getElementById('minMcap').value = '';
+            document.getElementById('maxMcap').value = '';
+            document.getElementById('minAthMcap').value = '';
+            document.getElementById('maxAthMcap').value = '';
+            document.getElementById('minVolume').value = '';
+            document.getElementById('dexFilter').value = '';
+            
+            filteredTokens = allTokens;
             renderTimeline();
             renderStats();
         }
