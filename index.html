@@ -14,13 +14,12 @@
             overflow-x: hidden;
         }
         
+        /* Header - NOT sticky so it doesn't block hover cards */
         header {
             background: rgba(10, 14, 39, 0.95);
             backdrop-filter: blur(10px);
             padding: 1.5rem 2rem;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
+            z-index: 100;
             border-bottom: 2px solid rgba(102, 126, 234, 0.3);
         }
         
@@ -113,11 +112,66 @@
             opacity: 0.7;
         }
         
-        /* HORIZONTAL TIMELINE */
+        /* Timeline wrapper with custom scrollbar */
         .timeline-wrapper {
             padding: 3rem 0;
             overflow-x: auto;
             overflow-y: hidden;
+            position: relative;
+        }
+        
+        /* Custom scrollbar */
+        .timeline-wrapper::-webkit-scrollbar {
+            height: 12px;
+        }
+        
+        .timeline-wrapper::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        
+        .timeline-wrapper::-webkit-scrollbar-thumb {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            border: 2px solid rgba(10, 14, 39, 0.5);
+        }
+        
+        .timeline-wrapper::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(90deg, #764ba2 0%, #667eea 100%);
+        }
+        
+        /* Scroll arrows */
+        .scroll-arrow {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background: rgba(102, 126, 234, 0.9);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            font-size: 1.5rem;
+            color: #fff;
+            transition: all 0.3s;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .scroll-arrow:hover {
+            background: rgba(118, 75, 162, 0.9);
+            transform: translateY(-50%) scale(1.1);
+        }
+        
+        .scroll-arrow.left {
+            left: 2rem;
+        }
+        
+        .scroll-arrow.right {
+            right: 2rem;
         }
         
         .timeline-container {
@@ -129,7 +183,6 @@
             width: max-content;
         }
         
-        /* Horizontal line */
         .timeline-line {
             position: absolute;
             top: 50%;
@@ -145,7 +198,6 @@
             z-index: 0;
         }
         
-        /* Token item */
         .token-item {
             display: flex;
             flex-direction: column;
@@ -161,7 +213,6 @@
             transform: translateY(-10px);
         }
         
-        /* Token avatar */
         .token-avatar {
             width: 80px;
             height: 80px;
@@ -195,29 +246,31 @@
             font-size: 2rem;
             font-weight: bold;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
         }
         
-        /* Token info card (shows on hover) */
+        /* Info card - appears ABOVE tokens now to avoid header */
         .token-info {
             position: absolute;
-            bottom: 100%;
+            top: 100%;
             left: 50%;
-            transform: translateX(-50%) translateY(-20px);
+            transform: translateX(-50%) translateY(20px);
             background: rgba(10, 14, 39, 0.98);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(102, 126, 234, 0.3);
+            border: 2px solid rgba(102, 126, 234, 0.5);
             border-radius: 12px;
             padding: 1rem;
             min-width: 250px;
             opacity: 0;
             pointer-events: none;
             transition: all 0.3s;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.8);
+            z-index: 2000;
         }
         
         .token-item:hover .token-info {
             opacity: 1;
-            transform: translateX(-50%) translateY(-10px);
+            transform: translateX(-50%) translateY(10px);
         }
         
         .token-info-header {
@@ -235,6 +288,7 @@
         .token-name {
             font-size: 0.85rem;
             opacity: 0.7;
+            margin-top: 0.25rem;
         }
         
         .token-stats {
@@ -257,7 +311,6 @@
             color: #10b981;
         }
         
-        /* Date label */
         .token-date {
             margin-top: 0.75rem;
             font-size: 0.75rem;
@@ -267,7 +320,6 @@
             white-space: nowrap;
         }
         
-        /* Links in hover card */
         .token-links {
             margin-top: 0.75rem;
             display: flex;
@@ -282,27 +334,13 @@
             color: #667eea;
             text-decoration: none;
             font-size: 0.75rem;
+            transition: background 0.2s;
         }
         
-        /* Scroll hint */
-        .scroll-hint {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            background: rgba(102, 126, 234, 0.9);
-            color: #fff;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            animation: bounce 2s infinite;
+        .token-link:hover {
+            background: rgba(102, 126, 234, 0.4);
         }
         
-        @keyframes bounce {
-            0%, 100% { transform: translateX(0); }
-            50% { transform: translateX(-10px); }
-        }
-        
-        /* Loading */
         .loading {
             text-align: center;
             padding: 3rem;
@@ -346,14 +384,15 @@
 
     <div class="stats-bar" id="stats"></div>
 
-    <div class="timeline-wrapper">
+    <div class="scroll-arrow left" onclick="scrollTimeline(-500)">←</div>
+    <div class="scroll-arrow right" onclick="scrollTimeline(500)">→</div>
+
+    <div class="timeline-wrapper" id="timelineWrapper">
         <div class="loading" id="loading">Loading timeline...</div>
         <div class="timeline-container" id="timeline">
             <div class="timeline-line"></div>
         </div>
     </div>
-
-    <div class="scroll-hint">← Scroll to explore →</div>
 
     <script>
         let allTokens = [];
@@ -371,6 +410,11 @@
                 document.getElementById('loading').style.display = 'none';
                 document.querySelector('.subtitle').textContent = `Tracking ${tokens.length} successful launches since January 2025`;
             });
+
+        function scrollTimeline(amount) {
+            const wrapper = document.getElementById('timelineWrapper');
+            wrapper.scrollBy({ left: amount, behavior: 'smooth' });
+        }
 
         function renderStats() {
             const total = filteredTokens.reduce((sum, t) => sum + (t.current_mcap || 0), 0);
@@ -405,54 +449,61 @@
                 const date = new Date(token.launch_date * 1000);
                 const age = Math.floor((Date.now() - date) / (1000 * 60 * 60 * 24));
                 
-                item.innerHTML = `
-                    <div class="token-avatar">
-                        <img src="https://dd.dexscreener.com/ds-data/tokens/solana/${token.address}.png" 
-                             onerror="this.parentElement.innerHTML='<div class=\\"token-icon-fallback\\">${token.symbol.charAt(0)}</div>'" 
-                             alt="${token.symbol}"/>
+                const avatar = document.createElement('div');
+                avatar.className = 'token-avatar';
+                
+                const img = document.createElement('img');
+                img.src = `https://dd.dexscreener.com/ds-data/tokens/solana/${token.address}.png`;
+                img.onerror = function() {
+                    this.parentElement.innerHTML = `<div class="token-icon-fallback">${token.symbol.charAt(0)}</div>`;
+                };
+                avatar.appendChild(img);
+                
+                const dateDiv = document.createElement('div');
+                dateDiv.className = 'token-date';
+                dateDiv.textContent = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' });
+                
+                const info = document.createElement('div');
+                info.className = 'token-info';
+                info.innerHTML = `
+                    <div class="token-info-header">
+                        <div class="token-symbol">${token.symbol}</div>
+                        <div class="token-name">${token.name}</div>
                     </div>
                     
-                    <div class="token-date">
-                        ${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' })}
+                    <div class="token-stats">
+                        <div class="stat-row">
+                            <span class="stat-label">Mcap:</span>
+                            <span class="stat-value">$${(token.current_mcap / 1e6).toFixed(2)}M</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">ATH:</span>
+                            <span class="stat-value">$${((token.ath_mcap || token.current_mcap) / 1e6).toFixed(2)}M</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">24h Vol:</span>
+                            <span class="stat-value">$${((token.volume_24h || 0) / 1e6).toFixed(2)}M</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Liquidity:</span>
+                            <span class="stat-value">$${((token.liquidity || 0) / 1e3).toFixed(0)}K</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Age:</span>
+                            <span class="stat-value">${age} days</span>
+                        </div>
                     </div>
                     
-                    <div class="token-info">
-                        <div class="token-info-header">
-                            <div class="token-symbol">${token.symbol}</div>
-                            <div class="token-name">${token.name}</div>
-                        </div>
-                        
-                        <div class="token-stats">
-                            <div class="stat-row">
-                                <span class="stat-label">Mcap:</span>
-                                <span class="stat-value">$${(token.current_mcap / 1e6).toFixed(2)}M</span>
-                            </div>
-                            <div class="stat-row">
-                                <span class="stat-label">ATH:</span>
-                                <span class="stat-value">$${((token.ath_mcap || token.current_mcap) / 1e6).toFixed(2)}M</span>
-                            </div>
-                            <div class="stat-row">
-                                <span class="stat-label">24h Vol:</span>
-                                <span class="stat-value">$${((token.volume_24h || 0) / 1e6).toFixed(2)}M</span>
-                            </div>
-                            <div class="stat-row">
-                                <span class="stat-label">Liquidity:</span>
-                                <span class="stat-value">$${((token.liquidity || 0) / 1e3).toFixed(0)}K</span>
-                            </div>
-                            <div class="stat-row">
-                                <span class="stat-label">Age:</span>
-                                <span class="stat-value">${age} days</span>
-                            </div>
-                        </div>
-                        
-                        <div class="token-links">
-                            <a href="${token.url}" target="_blank" class="token-link" onclick="event.stopPropagation()">📊 Chart</a>
-                            ${token.twitter ? `<a href="${token.twitter}" target="_blank" class="token-link" onclick="event.stopPropagation()">🐦 X</a>` : ''}
-                            ${token.telegram ? `<a href="${token.telegram}" target="_blank" class="token-link" onclick="event.stopPropagation()">💬 TG</a>` : ''}
-                        </div>
+                    <div class="token-links">
+                        <a href="${token.url}" target="_blank" class="token-link" onclick="event.stopPropagation()">📊 Chart</a>
+                        ${token.twitter ? `<a href="${token.twitter}" target="_blank" class="token-link" onclick="event.stopPropagation()">🐦 X</a>` : ''}
+                        ${token.telegram ? `<a href="${token.telegram}" target="_blank" class="token-link" onclick="event.stopPropagation()">💬 TG</a>` : ''}
                     </div>
                 `;
                 
+                item.appendChild(avatar);
+                item.appendChild(dateDiv);
+                item.appendChild(info);
                 item.onclick = () => window.open(token.url, '_blank');
                 timeline.appendChild(item);
             });
