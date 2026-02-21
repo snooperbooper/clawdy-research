@@ -3,19 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solana Token Launch Timeline | Clawdy Research</title>
+    <title>Solana Token Timeline | Clawdy Research</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
             color: #e0e0e0;
-            line-height: 1.6;
             overflow-x: hidden;
         }
         
-        /* Header */
         header {
             background: rgba(10, 14, 39, 0.95);
             backdrop-filter: blur(10px);
@@ -24,7 +22,6 @@
             top: 0;
             z-index: 1000;
             border-bottom: 2px solid rgba(102, 126, 234, 0.3);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
         
         h1 {
@@ -35,20 +32,12 @@
             margin-bottom: 0.5rem;
         }
         
-        .subtitle {
-            font-size: 1rem;
-            opacity: 0.7;
-        }
-        
-        /* Search & Filters */
         .controls {
             background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            padding: 1.5rem 2rem;
+            padding: 1rem 2rem;
             display: flex;
             gap: 1rem;
             flex-wrap: wrap;
-            align-items: center;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
@@ -66,13 +55,11 @@
             border-radius: 8px;
             color: #fff;
             font-size: 1rem;
-            transition: all 0.3s;
         }
         
         .search-box input:focus {
             outline: none;
             border-color: #667eea;
-            background: rgba(255, 255, 255, 0.15);
         }
         
         .search-icon {
@@ -80,7 +67,6 @@
             left: 0.75rem;
             top: 50%;
             transform: translateY(-50%);
-            opacity: 0.5;
         }
         
         .filter-group {
@@ -89,13 +75,12 @@
             align-items: center;
         }
         
-        .filter-group input, .filter-group select {
+        .filter-group input, select {
             padding: 0.5rem 0.75rem;
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 6px;
             color: #fff;
-            font-size: 0.9rem;
         }
         
         .btn {
@@ -106,25 +91,15 @@
             color: #fff;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s;
         }
         
-        .btn:hover {
-            transform: translateY(-2px);
-        }
-        
-        /* Stats Bar */
+        /* Stats */
         .stats-bar {
             display: flex;
             gap: 2rem;
             padding: 1rem 2rem;
             background: rgba(255, 255, 255, 0.03);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             justify-content: center;
-        }
-        
-        .stat {
-            text-align: center;
         }
         
         .stat-value {
@@ -136,170 +111,82 @@
         .stat-label {
             font-size: 0.85rem;
             opacity: 0.7;
-            text-transform: uppercase;
-            letter-spacing: 1px;
         }
         
-        /* Timeline Container */
+        /* HORIZONTAL TIMELINE */
+        .timeline-wrapper {
+            padding: 3rem 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+        
         .timeline-container {
-            padding: 2rem;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        
-        .timeline {
+            display: flex;
+            align-items: center;
+            min-height: 400px;
             position: relative;
-            padding: 2rem 0;
+            padding: 2rem 100px;
+            width: max-content;
         }
         
-        /* Timeline Line */
-        .timeline::before {
-            content: '';
+        /* Horizontal line */
+        .timeline-line {
             position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 2px;
-            height: 100%;
-            background: linear-gradient(180deg, 
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, 
                 rgba(102, 126, 234, 0) 0%,
                 rgba(102, 126, 234, 0.5) 10%,
                 rgba(102, 126, 234, 0.5) 90%,
                 rgba(102, 126, 234, 0) 100%
             );
+            z-index: 0;
         }
         
-        /* Token Entry */
-        .token-entry {
+        /* Token item */
+        .token-item {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            margin-bottom: 3rem;
+            margin: 0 2rem;
             position: relative;
-            opacity: 0;
-            animation: fadeInUp 0.5s forwards;
-        }
-        
-        @keyframes fadeInUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .token-entry:nth-child(odd) {
-            flex-direction: row-reverse;
-            transform: translateY(20px);
-        }
-        
-        .token-entry:nth-child(even) {
-            transform: translateY(20px);
-        }
-        
-        .token-entry:nth-child(odd) .token-content {
-            text-align: right;
-        }
-        
-        .token-content {
-            flex: 1;
-            padding: 0 2rem;
-            max-width: 45%;
-        }
-        
-        .token-date {
-            font-size: 0.85rem;
-            color: #667eea;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-        
-        /* Token Card */
-        .token-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 1.5rem;
+            z-index: 1;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: transform 0.3s;
         }
         
-        .token-card:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: #667eea;
-            transform: scale(1.02);
-            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.3);
+        .token-item:hover {
+            transform: translateY(-10px);
         }
         
-        .token-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 0.75rem;
-        }
-        
-        .token-symbol {
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: #fff;
-        }
-        
-        .token-name {
-            font-size: 0.9rem;
-            opacity: 0.7;
-        }
-        
-        .token-stats {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.5rem;
-            margin-top: 0.75rem;
-            padding-top: 0.75rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .stat-item {
-            font-size: 0.85rem;
-        }
-        
-        .stat-item-label {
-            opacity: 0.6;
-        }
-        
-        .stat-item-value {
-            font-weight: 600;
-            color: #10b981;
-        }
-        
-        /* Center Marker */
-        .timeline-marker {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
+        /* Token avatar */
+        .token-avatar {
             width: 80px;
             height: 80px;
-            background: rgba(10, 14, 39, 0.95);
-            border: 3px solid #667eea;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
+            border: 3px solid #667eea;
             overflow: hidden;
-            box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+            background: rgba(10, 14, 39, 0.95);
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s;
+            position: relative;
         }
         
-        .timeline-marker img {
+        .token-item:hover .token-avatar {
+            border-width: 4px;
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.8);
+            transform: scale(1.1);
+        }
+        
+        .token-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
         
-        .timeline-marker:hover {
-            transform: translateX(-50%) scale(1.1);
-            box-shadow: 0 0 30px rgba(102, 126, 234, 0.8);
-        }
-        
-        /* No image fallback */
-        .token-icon {
+        .token-icon-fallback {
             width: 100%;
             height: 100%;
             display: flex;
@@ -310,7 +197,77 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
         
-        /* Links */
+        /* Token info card (shows on hover) */
+        .token-info {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: rgba(10, 14, 39, 0.98);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            min-width: 250px;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+        }
+        
+        .token-item:hover .token-info {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-10px);
+        }
+        
+        .token-info-header {
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .token-symbol {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #fff;
+        }
+        
+        .token-name {
+            font-size: 0.85rem;
+            opacity: 0.7;
+        }
+        
+        .token-stats {
+            display: grid;
+            gap: 0.5rem;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+        }
+        
+        .stat-label {
+            opacity: 0.6;
+        }
+        
+        .stat-value {
+            font-weight: 600;
+            color: #10b981;
+        }
+        
+        /* Date label */
+        .token-date {
+            margin-top: 0.75rem;
+            font-size: 0.75rem;
+            color: #667eea;
+            font-weight: 600;
+            text-align: center;
+            white-space: nowrap;
+        }
+        
+        /* Links in hover card */
         .token-links {
             margin-top: 0.75rem;
             display: flex;
@@ -319,60 +276,49 @@
         }
         
         .token-link {
-            padding: 0.25rem 0.75rem;
+            padding: 0.25rem 0.5rem;
             background: rgba(102, 126, 234, 0.2);
             border-radius: 4px;
             color: #667eea;
             text-decoration: none;
-            font-size: 0.85rem;
-            transition: all 0.2s;
+            font-size: 0.75rem;
         }
         
-        .token-link:hover {
-            background: rgba(102, 126, 234, 0.4);
-            transform: translateY(-1px);
+        /* Scroll hint */
+        .scroll-hint {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: rgba(102, 126, 234, 0.9);
+            color: #fff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(-10px); }
         }
         
         /* Loading */
         .loading {
             text-align: center;
             padding: 3rem;
-            font-size: 1.2rem;
-            opacity: 0.7;
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .timeline::before {
-                left: 30px;
-            }
-            
-            .token-entry {
-                flex-direction: column !important;
-            }
-            
-            .token-content {
-                max-width: 100%;
-                text-align: left !important;
-                padding-left: 60px;
-            }
-            
-            .timeline-marker {
-                left: 30px;
-            }
         }
     </style>
 </head>
 <body>
     <header>
         <h1>🚀 Solana Token Launch Timeline</h1>
-        <p class="subtitle">Tracking 115 successful launches since January 2025</p>
+        <p class="subtitle" id="subtitle">Loading tokens...</p>
     </header>
 
     <div class="controls">
         <div class="search-box">
             <span class="search-icon">🔍</span>
-            <input type="text" id="search" placeholder="Search tokens by name or symbol...">
+            <input type="text" id="search" placeholder="Search tokens...">
         </div>
         
         <div class="filter-group">
@@ -382,13 +328,13 @@
         
         <div class="filter-group">
             <label>To:</label>
-            <input type="date" id="dateTo" value="2026-02-21">
+            <input type="date" id="dateTo">
         </div>
         
         <div class="filter-group">
             <label>DEX:</label>
             <select id="dexFilter">
-                <option value="">All DEXs</option>
+                <option value="">All</option>
                 <option value="raydium">Raydium</option>
                 <option value="orca">Orca</option>
                 <option value="meteora">Meteora</option>
@@ -400,16 +346,21 @@
 
     <div class="stats-bar" id="stats"></div>
 
-    <div class="timeline-container">
+    <div class="timeline-wrapper">
         <div class="loading" id="loading">Loading timeline...</div>
-        <div class="timeline" id="timeline"></div>
+        <div class="timeline-container" id="timeline">
+            <div class="timeline-line"></div>
+        </div>
     </div>
+
+    <div class="scroll-hint">← Scroll to explore →</div>
 
     <script>
         let allTokens = [];
         let filteredTokens = [];
 
-        // Load data
+        document.getElementById('dateTo').value = new Date().toISOString().split('T')[0];
+
         fetch('data.json')
             .then(r => r.json())
             .then(tokens => {
@@ -418,110 +369,104 @@
                 renderTimeline();
                 renderStats();
                 document.getElementById('loading').style.display = 'none';
+                document.querySelector('.subtitle').textContent = `Tracking ${tokens.length} successful launches since January 2025`;
             });
 
         function renderStats() {
-            const stats = {
-                total: filteredTokens.length,
-                totalMcap: filteredTokens.reduce((sum, t) => sum + (t.current_mcap || 0), 0),
-                totalVolume: filteredTokens.reduce((sum, t) => sum + (t.volume_24h || 0), 0),
-                avgMcap: filteredTokens.length > 0 
-                    ? filteredTokens.reduce((sum, t) => sum + (t.current_mcap || 0), 0) / filteredTokens.length 
-                    : 0
-            };
+            const total = filteredTokens.reduce((sum, t) => sum + (t.current_mcap || 0), 0);
+            const vol = filteredTokens.reduce((sum, t) => sum + (t.volume_24h || 0), 0);
 
             document.getElementById('stats').innerHTML = `
                 <div class="stat">
-                    <div class="stat-value">${stats.total}</div>
+                    <div class="stat-value">${filteredTokens.length}</div>
                     <div class="stat-label">Tokens</div>
                 </div>
                 <div class="stat">
-                    <div class="stat-value">$${(stats.totalMcap / 1e9).toFixed(1)}B</div>
-                    <div class="stat-label">Total Market Cap</div>
+                    <div class="stat-value">$${(total / 1e9).toFixed(1)}B</div>
+                    <div class="stat-label">Total Mcap</div>
                 </div>
                 <div class="stat">
-                    <div class="stat-value">$${(stats.totalVolume / 1e6).toFixed(1)}M</div>
+                    <div class="stat-value">$${(vol / 1e6).toFixed(1)}M</div>
                     <div class="stat-label">24h Volume</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-value">$${(stats.avgMcap / 1e6).toFixed(1)}M</div>
-                    <div class="stat-label">Avg Market Cap</div>
                 </div>
             `;
         }
 
         function renderTimeline() {
             const timeline = document.getElementById('timeline');
+            const line = timeline.querySelector('.timeline-line');
             timeline.innerHTML = '';
+            timeline.appendChild(line);
 
-            filteredTokens.forEach((token, index) => {
-                const entry = document.createElement('div');
-                entry.className = 'token-entry';
-                entry.style.animationDelay = `${index * 0.05}s`;
+            filteredTokens.forEach(token => {
+                const item = document.createElement('div');
+                item.className = 'token-item';
                 
-                const launchDate = new Date(token.launch_date * 1000);
-                const age = Math.floor((Date.now() - launchDate) / (1000 * 60 * 60 * 24));
+                const date = new Date(token.launch_date * 1000);
+                const age = Math.floor((Date.now() - date) / (1000 * 60 * 60 * 24));
                 
-                entry.innerHTML = `
-                    <div class="timeline-marker">
-                        ${token.image_url ? 
-                            `<img src="${token.image_url}" alt="${token.symbol}" onerror="this.parentElement.innerHTML='<div class=\"token-icon\">${token.symbol.charAt(0)}</div>'"/>` :
-                            `<div class="token-icon">${token.symbol.charAt(0)}</div>`
-                        }
+                item.innerHTML = `
+                    <div class="token-avatar">
+                        <img src="https://dd.dexscreener.com/ds-data/tokens/solana/${token.address}.png" 
+                             onerror="this.parentElement.innerHTML='<div class=\\"token-icon-fallback\\">${token.symbol.charAt(0)}</div>'" 
+                             alt="${token.symbol}"/>
                     </div>
                     
-                    <div class="token-content">
-                        <div class="token-date">${launchDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+                    <div class="token-date">
+                        ${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' })}
+                    </div>
+                    
+                    <div class="token-info">
+                        <div class="token-info-header">
+                            <div class="token-symbol">${token.symbol}</div>
+                            <div class="token-name">${token.name}</div>
+                        </div>
                         
-                        <div class="token-card" onclick="window.open('${token.url}', '_blank')">
-                            <div class="token-header">
-                                <div>
-                                    <div class="token-symbol">${token.symbol}</div>
-                                    <div class="token-name">${token.name}</div>
-                                </div>
+                        <div class="token-stats">
+                            <div class="stat-row">
+                                <span class="stat-label">Mcap:</span>
+                                <span class="stat-value">$${(token.current_mcap / 1e6).toFixed(2)}M</span>
                             </div>
-                            
-                            <div class="token-stats">
-                                <div class="stat-item">
-                                    <span class="stat-item-label">Market Cap: </span>
-                                    <span class="stat-item-value">$${(token.current_mcap / 1e6).toFixed(2)}M</span>
-                                </div>
-                                <div class="stat-item">
-                                    <span class="stat-item-label">ATH: </span>
-                                    <span class="stat-item-value">$${((token.ath_mcap || token.current_mcap) / 1e6).toFixed(2)}M</span>
-                                </div>
-                                <div class="stat-item">
-                                    <span class="stat-item-label">24h Vol: </span>
-                                    <span class="stat-item-value">$${((token.volume_24h || 0) / 1e6).toFixed(2)}M</span>
-                                </div>
-                                <div class="stat-item">
-                                    <span class="stat-item-label">Age: </span>
-                                    <span class="stat-item-value">${age}d</span>
-                                </div>
+                            <div class="stat-row">
+                                <span class="stat-label">ATH:</span>
+                                <span class="stat-value">$${((token.ath_mcap || token.current_mcap) / 1e6).toFixed(2)}M</span>
                             </div>
-                            
-                            <div class="token-links">
-                                <span class="token-link">📊 ${token.dex}</span>
-                                ${token.twitter ? '<a href="' + token.twitter + '" class="token-link" onclick="event.stopPropagation()">🐦 Twitter</a>' : ''}
-                                ${token.telegram ? '<a href="' + token.telegram + '" class="token-link" onclick="event.stopPropagation()">💬 Telegram</a>' : ''}
+                            <div class="stat-row">
+                                <span class="stat-label">24h Vol:</span>
+                                <span class="stat-value">$${((token.volume_24h || 0) / 1e6).toFixed(2)}M</span>
                             </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Liquidity:</span>
+                                <span class="stat-value">$${((token.liquidity || 0) / 1e3).toFixed(0)}K</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Age:</span>
+                                <span class="stat-value">${age} days</span>
+                            </div>
+                        </div>
+                        
+                        <div class="token-links">
+                            <a href="${token.url}" target="_blank" class="token-link" onclick="event.stopPropagation()">📊 Chart</a>
+                            ${token.twitter ? `<a href="${token.twitter}" target="_blank" class="token-link" onclick="event.stopPropagation()">🐦 X</a>` : ''}
+                            ${token.telegram ? `<a href="${token.telegram}" target="_blank" class="token-link" onclick="event.stopPropagation()">💬 TG</a>` : ''}
                         </div>
                     </div>
                 `;
                 
-                timeline.appendChild(entry);
+                item.onclick = () => window.open(token.url, '_blank');
+                timeline.appendChild(item);
             });
         }
 
         function applyFilters() {
             const search = document.getElementById('search').value.toLowerCase();
-            const dateFrom = new Date(document.getElementById('dateFrom').value).getTime() / 1000;
-            const dateTo = new Date(document.getElementById('dateTo').value).getTime() / 1000 + 86400;
+            const from = new Date(document.getElementById('dateFrom').value).getTime() / 1000;
+            const to = new Date(document.getElementById('dateTo').value).getTime() / 1000 + 86400;
             const dex = document.getElementById('dexFilter').value;
 
             filteredTokens = allTokens.filter(t => {
                 if (search && !t.symbol.toLowerCase().includes(search) && !t.name.toLowerCase().includes(search)) return false;
-                if (t.launch_date < dateFrom || t.launch_date > dateTo) return false;
+                if (t.launch_date < from || t.launch_date > to) return false;
                 if (dex && t.dex.toLowerCase() !== dex.toLowerCase()) return false;
                 return true;
             });
@@ -530,7 +475,6 @@
             renderStats();
         }
 
-        // Real-time search
         document.getElementById('search').addEventListener('input', applyFilters);
     </script>
 </body>
