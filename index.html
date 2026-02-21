@@ -4,214 +4,406 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Solana Token Launch Timeline | Clawdy Research</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.3.1/dist/chartjs-adapter-luxon.umd.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: #0a0e27;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
             color: #e0e0e0;
             line-height: 1.6;
+            overflow-x: hidden;
         }
+        
+        /* Header */
         header {
+            background: rgba(10, 14, 39, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        
+        h1 {
+            font-size: 2rem;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 2rem 1rem;
-            text-align: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-        }
-        header h1 {
-            font-size: 2.5rem;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             margin-bottom: 0.5rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
-        header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
+        
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.7;
         }
-        .container {
+        
+        /* Search & Filters */
+        .controls {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 2rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.5;
+        }
+        
+        .filter-group {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        
+        .filter-group input, .filter-group select {
+            padding: 0.5rem 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            color: #fff;
+            font-size: 0.9rem;
+        }
+        
+        .btn {
+            padding: 0.5rem 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 6px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            gap: 2rem;
+            padding: 1rem 2rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            justify-content: center;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* Timeline Container */
+        .timeline-container {
+            padding: 2rem;
             max-width: 1400px;
             margin: 0 auto;
-            padding: 2rem 1rem;
         }
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
+        
+        .timeline {
+            position: relative;
+            padding: 2rem 0;
         }
-        .stat-card {
+        
+        /* Timeline Line */
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(180deg, 
+                rgba(102, 126, 234, 0) 0%,
+                rgba(102, 126, 234, 0.5) 10%,
+                rgba(102, 126, 234, 0.5) 90%,
+                rgba(102, 126, 234, 0) 100%
+            );
+        }
+        
+        /* Token Entry */
+        .token-entry {
+            display: flex;
+            align-items: center;
+            margin-bottom: 3rem;
+            position: relative;
+            opacity: 0;
+            animation: fadeInUp 0.5s forwards;
+        }
+        
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .token-entry:nth-child(odd) {
+            flex-direction: row-reverse;
+            transform: translateY(20px);
+        }
+        
+        .token-entry:nth-child(even) {
+            transform: translateY(20px);
+        }
+        
+        .token-entry:nth-child(odd) .token-content {
+            text-align: right;
+        }
+        
+        .token-content {
+            flex: 1;
+            padding: 0 2rem;
+            max-width: 45%;
+        }
+        
+        .token-date {
+            font-size: 0.85rem;
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Token Card */
+        .token-card {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
             padding: 1.5rem;
-            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
         }
-        .stat-value {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #667eea;
-            margin-bottom: 0.5rem;
-        }
-        .stat-label {
-            font-size: 0.9rem;
-            opacity: 0.7;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .filters {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        .filter-group {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .filter-group label {
-            font-weight: 600;
-            margin-right: 0.5rem;
-        }
-        .filter-group input, .filter-group select {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 6px;
-            padding: 0.5rem 1rem;
-            color: #fff;
-            font-size: 0.95rem;
-        }
-        .chart-container {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            height: 500px;
-        }
-        .token-list {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 1.5rem;
-        }
-        .token-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            transition: all 0.3s ease;
-        }
+        
         .token-card:hover {
             background: rgba(255, 255, 255, 0.08);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            border-color: #667eea;
+            transform: scale(1.02);
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.3);
         }
+        
         .token-header {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
         }
-        .token-name {
+        
+        .token-symbol {
             font-size: 1.3rem;
             font-weight: bold;
+            color: #fff;
         }
-        .token-symbol {
-            color: #667eea;
-            font-size: 1.1rem;
+        
+        .token-name {
+            font-size: 0.9rem;
+            opacity: 0.7;
         }
-        .token-mcap {
-            font-size: 1.5rem;
-            font-weight: bold;
+        
+        .token-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .stat-item {
+            font-size: 0.85rem;
+        }
+        
+        .stat-item-label {
+            opacity: 0.6;
+        }
+        
+        .stat-item-value {
+            font-weight: 600;
             color: #10b981;
         }
-        .token-details {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-        .detail-item {
+        
+        /* Center Marker */
+        .timeline-marker {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 80px;
+            background: rgba(10, 14, 39, 0.95);
+            border: 3px solid #667eea;
+            border-radius: 50%;
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
         }
-        .detail-label {
-            font-size: 0.85rem;
-            opacity: 0.6;
-            margin-bottom: 0.25rem;
+        
+        .timeline-marker img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
-        .detail-value {
-            font-weight: 600;
+        
+        .timeline-marker:hover {
+            transform: translateX(-50%) scale(1.1);
+            box-shadow: 0 0 30px rgba(102, 126, 234, 0.8);
         }
+        
+        /* No image fallback */
+        .token-icon {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        /* Links */
         .token-links {
-            margin-top: 1rem;
+            margin-top: 0.75rem;
             display: flex;
             gap: 0.5rem;
+            flex-wrap: wrap;
         }
-        .token-links a {
+        
+        .token-link {
+            padding: 0.25rem 0.75rem;
             background: rgba(102, 126, 234, 0.2);
+            border-radius: 4px;
             color: #667eea;
-            padding: 0.4rem 0.8rem;
-            border-radius: 6px;
             text-decoration: none;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             transition: all 0.2s;
         }
-        .token-links a:hover {
+        
+        .token-link:hover {
             background: rgba(102, 126, 234, 0.4);
+            transform: translateY(-1px);
         }
-        footer {
+        
+        /* Loading */
+        .loading {
             text-align: center;
-            padding: 2rem;
-            opacity: 0.6;
-            font-size: 0.9rem;
+            padding: 3rem;
+            font-size: 1.2rem;
+            opacity: 0.7;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .timeline::before {
+                left: 30px;
+            }
+            
+            .token-entry {
+                flex-direction: column !important;
+            }
+            
+            .token-content {
+                max-width: 100%;
+                text-align: left !important;
+                padding-left: 60px;
+            }
+            
+            .timeline-marker {
+                left: 30px;
+            }
         }
     </style>
 </head>
 <body>
     <header>
         <h1>🚀 Solana Token Launch Timeline</h1>
-        <p>Tracking successful token launches since January 2025</p>
+        <p class="subtitle">Tracking 115 successful launches since January 2025</p>
     </header>
 
-    <div class="container">
-        <div class="stats" id="stats"></div>
-
-        <div class="filters">
-            <div class="filter-group">
-                <label>Min Market Cap:</label>
-                <input type="number" id="minMcap" placeholder="$1M" min="0" step="1000000" value="1000000">
-                
-                <label>Min Volume:</label>
-                <input type="number" id="minVolume" placeholder="$0" min="0" step="100000" value="0">
-                
-                <label>DEX:</label>
-                <select id="dexFilter">
-                    <option value="">All DEXs</option>
-                    <option value="raydium">Raydium</option>
-                    <option value="orca">Orca</option>
-                    <option value="meteora">Meteora</option>
-                </select>
-                
-                <button onclick="applyFilters()" style="background: #667eea; color: #fff; border: none; padding: 0.5rem 1.5rem; border-radius: 6px; cursor: pointer; font-weight: bold;">Apply Filters</button>
-            </div>
+    <div class="controls">
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="search" placeholder="Search tokens by name or symbol...">
         </div>
-
-        <div class="chart-container">
-            <canvas id="timeline"></canvas>
+        
+        <div class="filter-group">
+            <label>From:</label>
+            <input type="date" id="dateFrom" value="2025-01-01">
         </div>
-
-        <div class="token-list" id="tokenList"></div>
+        
+        <div class="filter-group">
+            <label>To:</label>
+            <input type="date" id="dateTo" value="2026-02-21">
+        </div>
+        
+        <div class="filter-group">
+            <label>DEX:</label>
+            <select id="dexFilter">
+                <option value="">All DEXs</option>
+                <option value="raydium">Raydium</option>
+                <option value="orca">Orca</option>
+                <option value="meteora">Meteora</option>
+            </select>
+        </div>
+        
+        <button class="btn" onclick="applyFilters()">Apply</button>
     </div>
 
-    <footer>
-        <p>🦞 Powered by Clawdy | Data updates every 5 minutes</p>
-        <p>Data sources: DexScreener, GeckoTerminal, CoinGecko</p>
-    </footer>
+    <div class="stats-bar" id="stats"></div>
+
+    <div class="timeline-container">
+        <div class="loading" id="loading">Loading timeline...</div>
+        <div class="timeline" id="timeline"></div>
+    </div>
 
     <script>
         let allTokens = [];
@@ -223,9 +415,9 @@
             .then(tokens => {
                 allTokens = tokens;
                 filteredTokens = tokens;
+                renderTimeline();
                 renderStats();
-                renderChart();
-                renderTokenList();
+                document.getElementById('loading').style.display = 'none';
             });
 
         function renderStats() {
@@ -239,147 +431,107 @@
             };
 
             document.getElementById('stats').innerHTML = `
-                <div class="stat-card">
+                <div class="stat">
                     <div class="stat-value">${stats.total}</div>
-                    <div class="stat-label">Total Tokens</div>
+                    <div class="stat-label">Tokens</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-value">$${(stats.totalMcap / 1e6).toFixed(1)}M</div>
+                <div class="stat">
+                    <div class="stat-value">$${(stats.totalMcap / 1e9).toFixed(1)}B</div>
                     <div class="stat-label">Total Market Cap</div>
                 </div>
-                <div class="stat-card">
+                <div class="stat">
                     <div class="stat-value">$${(stats.totalVolume / 1e6).toFixed(1)}M</div>
                     <div class="stat-label">24h Volume</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-value">$${(stats.avgMcap / 1e6).toFixed(2)}M</div>
+                <div class="stat">
+                    <div class="stat-value">$${(stats.avgMcap / 1e6).toFixed(1)}M</div>
                     <div class="stat-label">Avg Market Cap</div>
                 </div>
             `;
         }
 
-        function renderChart() {
-            const ctx = document.getElementById('timeline').getContext('2d');
-            
-            new Chart(ctx, {
-                type: 'bubble',
-                data: {
-                    datasets: [{
-                        label: 'Token Launches',
-                        data: filteredTokens.map(t => ({
-                            x: new Date(t.launch_date * 1000),
-                            y: t.current_mcap / 1e6,
-                            r: Math.sqrt(t.volume_24h / 1e6) * 2,
-                            token: t
-                        })),
-                        backgroundColor: 'rgba(102, 126, 234, 0.6)',
-                        borderColor: 'rgba(102, 126, 234, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: (ctx) => {
-                                    const t = ctx.raw.token;
-                                    return [
-                                        `${t.symbol} (${t.name})`,
-                                        `Market Cap: $${(t.current_mcap / 1e6).toFixed(2)}M`,
-                                        `24h Volume: $${(t.volume_24h / 1e6).toFixed(2)}M`,
-                                        `Launched: ${new Date(t.launch_date * 1000).toLocaleDateString()}`
-                                    ];
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            type: 'time',
-                            time: {
-                                unit: 'day'
-                            },
-                            title: {
-                                display: true,
-                                text: 'Launch Date',
-                                color: '#fff'
-                            },
-                            ticks: { color: '#fff' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Market Cap ($M)',
-                                color: '#fff'
-                            },
-                            ticks: { color: '#fff' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                        }
-                    }
-                }
-            });
-        }
+        function renderTimeline() {
+            const timeline = document.getElementById('timeline');
+            timeline.innerHTML = '';
 
-        function renderTokenList() {
-            const list = document.getElementById('tokenList');
-            list.innerHTML = '<h2 style="margin-bottom: 1rem;">All Tokens</h2>' +
-                filteredTokens.map(t => `
-                    <div class="token-card">
-                        <div class="token-header">
-                            <div>
-                                <div class="token-name">${t.name}</div>
-                                <div class="token-symbol">${t.symbol}</div>
+            filteredTokens.forEach((token, index) => {
+                const entry = document.createElement('div');
+                entry.className = 'token-entry';
+                entry.style.animationDelay = `${index * 0.05}s`;
+                
+                const launchDate = new Date(token.launch_date * 1000);
+                const age = Math.floor((Date.now() - launchDate) / (1000 * 60 * 60 * 24));
+                
+                entry.innerHTML = `
+                    <div class="timeline-marker">
+                        ${token.image_url ? 
+                            `<img src="${token.image_url}" alt="${token.symbol}" onerror="this.parentElement.innerHTML='<div class=\"token-icon\">${token.symbol.charAt(0)}</div>'"/>` :
+                            `<div class="token-icon">${token.symbol.charAt(0)}</div>`
+                        }
+                    </div>
+                    
+                    <div class="token-content">
+                        <div class="token-date">${launchDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+                        
+                        <div class="token-card" onclick="window.open('${token.url}', '_blank')">
+                            <div class="token-header">
+                                <div>
+                                    <div class="token-symbol">${token.symbol}</div>
+                                    <div class="token-name">${token.name}</div>
+                                </div>
                             </div>
-                            <div class="token-mcap">$${(t.current_mcap / 1e6).toFixed(2)}M</div>
-                        </div>
-                        <div class="token-details">
-                            <div class="detail-item">
-                                <span class="detail-label">Launched</span>
-                                <span class="detail-value">${new Date(t.launch_date * 1000).toLocaleDateString()}</span>
+                            
+                            <div class="token-stats">
+                                <div class="stat-item">
+                                    <span class="stat-item-label">Market Cap: </span>
+                                    <span class="stat-item-value">$${(token.current_mcap / 1e6).toFixed(2)}M</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-item-label">ATH: </span>
+                                    <span class="stat-item-value">$${((token.ath_mcap || token.current_mcap) / 1e6).toFixed(2)}M</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-item-label">24h Vol: </span>
+                                    <span class="stat-item-value">$${((token.volume_24h || 0) / 1e6).toFixed(2)}M</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-item-label">Age: </span>
+                                    <span class="stat-item-value">${age}d</span>
+                                </div>
                             </div>
-                            <div class="detail-item">
-                                <span class="detail-label">24h Volume</span>
-                                <span class="detail-value">$${(t.volume_24h / 1e6).toFixed(2)}M</span>
+                            
+                            <div class="token-links">
+                                <span class="token-link">📊 ${token.dex}</span>
+                                ${token.twitter ? '<a href="' + token.twitter + '" class="token-link" onclick="event.stopPropagation()">🐦 Twitter</a>' : ''}
+                                ${token.telegram ? '<a href="' + token.telegram + '" class="token-link" onclick="event.stopPropagation()">💬 Telegram</a>' : ''}
                             </div>
-                            <div class="detail-item">
-                                <span class="detail-label">Liquidity</span>
-                                <span class="detail-value">$${(t.liquidity / 1e3).toFixed(1)}K</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label">DEX</span>
-                                <span class="detail-value">${t.dex}</span>
-                            </div>
-                        </div>
-                        <div class="token-links">
-                            <a href="${t.url}" target="_blank">📊 Chart</a>
-                            ${t.twitter ? `<a href="${t.twitter}" target="_blank">🐦 Twitter</a>` : ''}
-                            ${t.telegram ? `<a href="${t.telegram}" target="_blank">💬 Telegram</a>` : ''}
-                            ${t.website ? `<a href="${t.website}" target="_blank">🌐 Website</a>` : ''}
                         </div>
                     </div>
-                `).join('');
+                `;
+                
+                timeline.appendChild(entry);
+            });
         }
 
         function applyFilters() {
-            const minMcap = parseFloat(document.getElementById('minMcap').value) || 0;
-            const minVolume = parseFloat(document.getElementById('minVolume').value) || 0;
-            const dexFilter = document.getElementById('dexFilter').value;
+            const search = document.getElementById('search').value.toLowerCase();
+            const dateFrom = new Date(document.getElementById('dateFrom').value).getTime() / 1000;
+            const dateTo = new Date(document.getElementById('dateTo').value).getTime() / 1000 + 86400;
+            const dex = document.getElementById('dexFilter').value;
 
             filteredTokens = allTokens.filter(t => {
-                if (t.current_mcap < minMcap) return false;
-                if (t.volume_24h < minVolume) return false;
-                if (dexFilter && t.dex !== dexFilter) return false;
+                if (search && !t.symbol.toLowerCase().includes(search) && !t.name.toLowerCase().includes(search)) return false;
+                if (t.launch_date < dateFrom || t.launch_date > dateTo) return false;
+                if (dex && t.dex.toLowerCase() !== dex.toLowerCase()) return false;
                 return true;
             });
 
+            renderTimeline();
             renderStats();
-            renderChart();
-            renderTokenList();
         }
+
+        // Real-time search
+        document.getElementById('search').addEventListener('input', applyFilters);
     </script>
 </body>
 </html>
