@@ -14,7 +14,6 @@
             overflow-x: hidden;
         }
         
-        /* Header - NOT sticky so it doesn't block hover cards */
         header {
             background: rgba(10, 14, 39, 0.95);
             backdrop-filter: blur(10px);
@@ -92,7 +91,6 @@
             cursor: pointer;
         }
         
-        /* Stats */
         .stats-bar {
             display: flex;
             gap: 2rem;
@@ -112,16 +110,14 @@
             opacity: 0.7;
         }
         
-        /* Timeline wrapper with custom scrollbar */
+        /* Timeline wrapper - increased height, no overflow-y hidden */
         .timeline-wrapper {
-            min-height: 500px;
-            padding: 3rem 0;
+            padding: 4rem 0 10rem 0;
             overflow-x: auto;
-            overflow-y: hidden;
             position: relative;
+            min-height: 600px;
         }
         
-        /* Custom scrollbar */
         .timeline-wrapper::-webkit-scrollbar {
             height: 12px;
         }
@@ -141,7 +137,6 @@
             background: linear-gradient(90deg, #764ba2 0%, #667eea 100%);
         }
         
-        /* Scroll arrows */
         .scroll-arrow {
             position: fixed;
             top: 50%;
@@ -167,18 +162,13 @@
             transform: translateY(-50%) scale(1.1);
         }
         
-        .scroll-arrow.left {
-            left: 2rem;
-        }
-        
-        .scroll-arrow.right {
-            right: 2rem;
-        }
+        .scroll-arrow.left { left: 2rem; }
+        .scroll-arrow.right { right: 2rem; }
         
         .timeline-container {
             display: flex;
             align-items: center;
-            min-height: 600px;
+            min-height: 200px;
             position: relative;
             padding: 2rem 100px;
             width: max-content;
@@ -223,7 +213,6 @@
             background: rgba(10, 14, 39, 0.95);
             box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
             transition: all 0.3s;
-            position: relative;
         }
         
         .token-item:hover .token-avatar {
@@ -250,12 +239,12 @@
             color: #fff;
         }
         
-        /* Info card - appears ABOVE tokens now to avoid header */
+        /* Info card below with plenty of space */
         .token-info {
             position: absolute;
-            top: 100%;
+            top: 110px;
             left: 50%;
-            transform: translateX(-50%) translateY(20px);
+            transform: translateX(-50%);
             background: rgba(10, 14, 39, 0.98);
             backdrop-filter: blur(10px);
             border: 2px solid rgba(102, 126, 234, 0.5);
