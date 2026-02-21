@@ -30,18 +30,23 @@
             margin-bottom: 0.5rem;
         }
         
-        /* Controls - expanded for more filters */
+        /* Controls - cleaner with collapsible filters */
         .controls {
             background: rgba(255, 255, 255, 0.05);
             padding: 1rem 2rem;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
+        .controls-row {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
         .search-box {
-            grid-column: 1 / -1;
+            flex: 1;
+            min-width: 250px;
             position: relative;
         }
         
@@ -65,6 +70,69 @@
             left: 0.75rem;
             top: 50%;
             transform: translateY(-50%);
+        }
+        
+        .sort-group {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        
+        .sort-group select {
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        
+        .sort-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .filter-toggle {
+            padding: 0.75rem 1.5rem;
+            background: rgba(102, 126, 234, 0.2);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 8px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .filter-toggle:hover {
+            background: rgba(102, 126, 234, 0.4);
+        }
+        
+        .filter-toggle.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        /* Collapsible filters panel */
+        .filters-panel {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .filters-panel.open {
+            max-height: 500px;
+        }
+        
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            padding: 1.5rem 2rem;
         }
         
         .filter-group {
@@ -94,11 +162,10 @@
             border-color: #667eea;
         }
         
-        .btn-group {
-            grid-column: 1 / -1;
+        .filter-actions {
+            padding: 0 2rem 1.5rem 2rem;
             display: flex;
             gap: 0.5rem;
-            justify-content: center;
         }
         
         .btn {
@@ -371,57 +438,81 @@
     </header>
 
     <div class="controls">
-        <div class="search-box">
-            <span class="search-icon">🔍</span>
-            <input type="text" id="search" placeholder="Search tokens...">
+        <div class="controls-row">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="search" placeholder="Search tokens...">
+            </div>
+            
+            <div class="sort-group">
+                <label>Sort by:</label>
+                <select id="sortBy" onchange="sortAndRender()">
+                    <option value="date-asc">Launch Date (Oldest First)</option>
+                    <option value="date-desc">Launch Date (Newest First)</option>
+                    <option value="mcap-desc">Current Mcap (High to Low)</option>
+                    <option value="mcap-asc">Current Mcap (Low to High)</option>
+                    <option value="ath-desc">ATH Mcap (High to Low)</option>
+                    <option value="ath-asc">ATH Mcap (Low to High)</option>
+                    <option value="volume-desc">24h Volume (High to Low)</option>
+                    <option value="volume-asc">24h Volume (Low to High)</option>
+                </select>
+            </div>
+            
+            <button class="filter-toggle" onclick="toggleFilters()">
+                <span id="filterIcon">▼</span> Filters
+            </button>
+        </div>
+    </div>
+
+    <div class="filters-panel" id="filtersPanel">
+        <div class="filters-grid">
+            <div class="filter-group">
+                <label>Date From</label>
+                <input type="date" id="dateFrom" value="2025-01-01">
+            </div>
+            
+            <div class="filter-group">
+                <label>Date To</label>
+                <input type="date" id="dateTo">
+            </div>
+            
+            <div class="filter-group">
+                <label>Min Current Mcap</label>
+                <input type="number" id="minMcap" placeholder="e.g. 100000" step="100000">
+            </div>
+            
+            <div class="filter-group">
+                <label>Max Current Mcap</label>
+                <input type="number" id="maxMcap" placeholder="Unlimited">
+            </div>
+            
+            <div class="filter-group">
+                <label>Min ATH Mcap</label>
+                <input type="number" id="minAthMcap" placeholder="e.g. 1000000" step="100000">
+            </div>
+            
+            <div class="filter-group">
+                <label>Max ATH Mcap</label>
+                <input type="number" id="maxAthMcap" placeholder="Unlimited">
+            </div>
+            
+            <div class="filter-group">
+                <label>Min 24h Volume</label>
+                <input type="number" id="minVolume" placeholder="e.g. 10000" step="10000">
+            </div>
+            
+            <div class="filter-group">
+                <label>DEX</label>
+                <select id="dexFilter">
+                    <option value="">All DEXs</option>
+                    <option value="raydium">Raydium</option>
+                    <option value="orca">Orca</option>
+                    <option value="meteora">Meteora</option>
+                </select>
+            </div>
         </div>
         
-        <div class="filter-group">
-            <label>Date From</label>
-            <input type="date" id="dateFrom" value="2025-01-01">
-        </div>
-        
-        <div class="filter-group">
-            <label>Date To</label>
-            <input type="date" id="dateTo">
-        </div>
-        
-        <div class="filter-group">
-            <label>Min Current Mcap</label>
-            <input type="number" id="minMcap" placeholder="e.g. 100000" step="100000">
-        </div>
-        
-        <div class="filter-group">
-            <label>Max Current Mcap</label>
-            <input type="number" id="maxMcap" placeholder="Unlimited">
-        </div>
-        
-        <div class="filter-group">
-            <label>Min ATH Mcap</label>
-            <input type="number" id="minAthMcap" placeholder="e.g. 1000000" step="100000">
-        </div>
-        
-        <div class="filter-group">
-            <label>Max ATH Mcap</label>
-            <input type="number" id="maxAthMcap" placeholder="Unlimited">
-        </div>
-        
-        <div class="filter-group">
-            <label>Min 24h Volume</label>
-            <input type="number" id="minVolume" placeholder="e.g. 10000" step="10000">
-        </div>
-        
-        <div class="filter-group">
-            <label>DEX</label>
-            <select id="dexFilter">
-                <option value="">All DEXs</option>
-                <option value="raydium">Raydium</option>
-                <option value="orca">Orca</option>
-                <option value="meteora">Meteora</option>
-            </select>
-        </div>
-        
-        <div class="btn-group">
+        <div class="filter-actions">
             <button class="btn" onclick="applyFilters()">Apply Filters</button>
             <button class="btn btn-secondary" onclick="resetFilters()">Reset</button>
         </div>
@@ -450,11 +541,21 @@
             .then(tokens => {
                 allTokens = tokens;
                 filteredTokens = tokens;
-                renderTimeline();
+                sortAndRender();
                 renderStats();
                 document.getElementById('loading').style.display = 'none';
                 document.querySelector('.subtitle').textContent = `Tracking ${tokens.length} successful launches since January 2025`;
             });
+
+        function toggleFilters() {
+            const panel = document.getElementById('filtersPanel');
+            const icon = document.getElementById('filterIcon');
+            const toggle = document.querySelector('.filter-toggle');
+            
+            panel.classList.toggle('open');
+            toggle.classList.toggle('active');
+            icon.textContent = panel.classList.contains('open') ? '▲' : '▼';
+        }
 
         function scrollTimeline(amount) {
             document.getElementById('timelineWrapper').scrollBy({ left: amount, behavior: 'smooth' });
@@ -485,6 +586,35 @@
                     <div class="stat-label">24h Volume</div>
                 </div>
             `;
+        }
+
+        function sortAndRender() {
+            const sortBy = document.getElementById('sortBy').value;
+            
+            filteredTokens.sort((a, b) => {
+                switch(sortBy) {
+                    case 'date-asc':
+                        return a.launch_date - b.launch_date;
+                    case 'date-desc':
+                        return b.launch_date - a.launch_date;
+                    case 'mcap-desc':
+                        return (b.current_mcap || 0) - (a.current_mcap || 0);
+                    case 'mcap-asc':
+                        return (a.current_mcap || 0) - (b.current_mcap || 0);
+                    case 'ath-desc':
+                        return (b.ath_mcap || b.current_mcap || 0) - (a.ath_mcap || a.current_mcap || 0);
+                    case 'ath-asc':
+                        return (a.ath_mcap || a.current_mcap || 0) - (b.ath_mcap || b.current_mcap || 0);
+                    case 'volume-desc':
+                        return (b.volume_24h || 0) - (a.volume_24h || 0);
+                    case 'volume-asc':
+                        return (a.volume_24h || 0) - (b.volume_24h || 0);
+                    default:
+                        return a.launch_date - b.launch_date;
+                }
+            });
+            
+            renderTimeline();
         }
 
         function renderTimeline() {
@@ -572,31 +702,23 @@
             const minVolume = parseFloat(document.getElementById('minVolume').value) || 0;
 
             filteredTokens = allTokens.filter(t => {
-                // Search
                 if (search && !t.symbol.toLowerCase().includes(search) && !t.name.toLowerCase().includes(search)) return false;
-                
-                // Date range
                 if (t.launch_date < from || t.launch_date > to) return false;
-                
-                // DEX
                 if (dex && t.dex.toLowerCase() !== dex.toLowerCase()) return false;
                 
-                // Current mcap range
                 const mcap = t.current_mcap || 0;
                 if (mcap < minMcap || mcap > maxMcap) return false;
                 
-                // ATH mcap range
                 const athMcap = t.ath_mcap || t.current_mcap || 0;
                 if (athMcap < minAthMcap || athMcap > maxAthMcap) return false;
                 
-                // Volume
                 const vol = t.volume_24h || 0;
                 if (vol < minVolume) return false;
                 
                 return true;
             });
 
-            renderTimeline();
+            sortAndRender();
             renderStats();
         }
 
@@ -610,9 +732,10 @@
             document.getElementById('maxAthMcap').value = '';
             document.getElementById('minVolume').value = '';
             document.getElementById('dexFilter').value = '';
+            document.getElementById('sortBy').value = 'date-asc';
             
             filteredTokens = allTokens;
-            renderTimeline();
+            sortAndRender();
             renderStats();
         }
 
